@@ -19,12 +19,16 @@ class Player:
             self.discounts[location] += percentage
         else:
             self.discounts[location] = percentage
+        if self.discounts[location] > 100:
+            self.discounts[location] = 100
 
     def addRentSplit(self, percentage: int, location: str):
         if location in self.rentSplits.keys():
             self.rentSplits[location] += percentage
         else:
             self.rentSplits[location] = percentage
+        if self.rentSplits[location] > 100:
+            self.rentSplits[location] = 100
 
     def checkRebate(self, list, val):
         if val in list.keys():
