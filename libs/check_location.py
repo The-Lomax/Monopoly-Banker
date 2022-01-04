@@ -1,0 +1,132 @@
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+
+
+class CheckLocation(tk.Tk):
+    def __init__(self, game, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.game = game
+        self.pad = 5
+
+        # window parameters
+        self.title("Check Location")
+        self.resizable(False, False)
+        self.rowconfigure((0, 1, 2, 3, 4), weight=1)
+
+        # Top row with combobox and button
+        self.mainFrame = tk.Frame(self)
+        self.mainFrame.grid(row=0, column=0, sticky="new", padx=self.pad, pady=self.pad)
+        self.mainFrame.columnconfigure(1, weight=1)
+
+        self.locLabel = tk.Label(
+            self.mainFrame,
+            text="Location: "
+        )
+        self.locLabel.grid(row=0, column=0, padx=self.pad, pady=self.pad)
+
+        self.locBox = ttk.Combobox(self.mainFrame)
+        self.locBox.configure(state="readonly")
+        self.locBox.grid(row=0, column=1, sticky="ew", padx=self.pad, pady=self.pad)
+
+        self.loadBtn = tk.Button(
+            self.mainFrame,
+            text="Load",
+            padx=self.pad,
+            width=5,
+            command=self.loadLoc
+        )
+        self.loadBtn.grid(row=0, column=2, sticky="e", padx=self.pad, pady=self.pad)
+
+        # Discounts label
+        self.secondFrame = tk.Frame(self)
+        self.secondFrame.grid(row=1, column=0, sticky="new", padx=self.pad, pady=self.pad)
+
+        tk.Label(
+            self.secondFrame,
+            text="Discounts:"
+        ).grid(sticky="new", padx=self.pad, pady=self.pad)
+
+        # List of discounts
+        self.thirdFrame = tk.Frame(self)
+        self.thirdFrame.grid(row=2, column=0, sticky="new", padx=self.pad, pady=self.pad)
+
+        # Splits label
+        self.fourthFrame = tk.Frame(self)
+        self.fourthFrame.grid(row=3, column=0, sticky="new", padx=self.pad, pady=self.pad)
+
+        tk.Label(
+            self.fourthFrame,
+            text="Rent Splits:"
+        ).grid(sticky="new", padx=self.pad, pady=self.pad)
+
+        # List of splits
+        self.fifthFrame = tk.Frame(self)
+        self.fifthFrame.grid(row=4, column=0, sticky="new", padx=self.pad, pady=self.pad)
+
+        # read locations into the combobox
+        self.readLocations()
+
+        # focus on window
+        self.focus_force()
+
+        # run window
+        self.mainloop()
+
+    def readLocations(self):
+        keys = [el for el in self.game.locations.keys()]
+        self.locBox['values'] = keys
+
+    def loadLoc(self):
+        # clear the list
+        for el in self.thirdFrame.winfo_children():
+            el.destroy()
+        for el in self.fifthFrame.winfo_children():
+            el.destroy()
+
+        locName = self.locBox.get()
+
+        if locName == "":
+            messagebox.showerror("error", "error! Please choose a location.", parent=self)
+            return
+
+        if len(self.game.locations[locName].discounts) > 0:
+            for player, pct in self.game.locations[locName].discounts:
+                tk.Label(
+                    self.thirdFrame,
+                    text=f"{player} - {pct}%"
+                ).pack(
+                    fill="x",
+                    padx=self.pad,
+                    pady=(self.pad, 0)
+                )
+        else:
+            tk.Label(
+                self.thirdFrame,
+                text="No discounts found."
+            ).pack(
+                fill="x",
+                padx=self.pad,
+                pady=(self.pad, 0)
+            )
+
+        if len(self.game.locations[locName].rentSplits) > 0:
+            for player, pct in self.game.locations[locName].rentSplits:
+                tk.Label(
+                    self.fifthFrame,
+                    text=f"{player} - {pct}%"
+                ).pack(
+                    fill="x",
+                    padx=self.pad,
+                    pady=(self.pad, 0)
+                )
+        else:
+            tk.Label(
+                self.fifthFrame,
+                text="No rent splits found."
+            ).pack(
+                fill="x",
+                padx=self.pad,
+                pady=(self.pad, 0)
+            )
