@@ -71,7 +71,7 @@ class PlayerInfo(tk.Tk):
 
         # update discounts
         if len(self.player.discounts) > 0:
-            for loc, pct in self.player.discounts:
+            for loc, pct in self.player.discounts.items():
                 tk.Label(
                     self.thirdFrame,
                     text=f"{loc} - {pct}%"
@@ -92,7 +92,7 @@ class PlayerInfo(tk.Tk):
 
         # update rent splits
         if len(self.player.rentSplits) > 0:
-            for loc, pct in self.player.rentSplits:
+            for loc, pct in self.player.rentSplits.items():
                 tk.Label(
                     self.fifthFrame,
                     text=f"{loc} - {pct}%"

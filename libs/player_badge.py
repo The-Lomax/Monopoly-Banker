@@ -2,7 +2,6 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from libs.player_info import PlayerInfo
 from libs.add_money import AddMoney
-from libs.take_money import TakeMoney
 
 
 class PlayerBadge(tk.Frame):
@@ -25,10 +24,6 @@ class PlayerBadge(tk.Frame):
         scale = addImg.resize((btnSize, btnSize))
         scaledAddImg = ImageTk.PhotoImage(scale)
 
-        takeImg = Image.open("assets/take.png")
-        scale = takeImg.resize((btnSize, btnSize))
-        scaledTakeImg = ImageTk.PhotoImage(scale)
-
         # Labels
         self.pName = tk.Label(
             self,
@@ -45,7 +40,7 @@ class PlayerBadge(tk.Frame):
 
         self.pBal = tk.Label(
             self,
-            text=f"$ {self.player.balance}",
+            text=f"$ {int(self.player.balance)}",
             font=self.lFont
         )
         self.pBal.pack(side="left", padx=(pad, 0))
@@ -67,19 +62,8 @@ class PlayerBadge(tk.Frame):
         self.addBtn.image = scaledAddImg
         self.addBtn.pack(side="left", padx=(pad, 0))
 
-        self.takeBtn = tk.Button(
-            self,
-            command=self.takeMoney
-        )
-        self.takeBtn["image"] = scaledTakeImg
-        self.takeBtn.image = scaledTakeImg
-        self.takeBtn.pack(side="left", padx=(pad, 0))
-
     def openInfo(self):
         PlayerInfo(self.player)
 
     def addMoney(self):
         AddMoney(self.controller, self.player)
-
-    def takeMoney(self):
-        TakeMoney(self.controller, self.player)

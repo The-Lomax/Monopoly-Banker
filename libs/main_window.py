@@ -22,6 +22,16 @@ class GameWindow(tk.Tk):
         self.playersFrame = tk.Frame(self)
 
         # DEBUGGING
+        self.game.addPlayer("P1", 500)
+        self.game.addPlayer("P2", 500)
+        self.game.addPlayer("P3", 500)
+
+        self.game.addLocation("Winterfell")
+        self.game.players["P1"].addDiscount(10, "Winterfell")
+        self.game.locations["Winterfell"].addDiscount("P1", 10)
+        self.game.players["P3"].addRentSplit(50, "Winterfell")
+        self.game.locations["Winterfell"].addRentSplit("P3", 50)
+        self.updateBadges()
 
         # focus on window
         self.focus_force()

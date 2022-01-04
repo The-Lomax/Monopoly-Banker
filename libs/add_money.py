@@ -23,9 +23,9 @@ class AddMoney(tk.Tk):
         # run window
         self.mainloop()
 
-    def moveMoney(self, target, amount):
-        self.origin.addFunds(amount)
-        target.takeFunds(amount)
+    def moveMoney(self, _from, _to, amount):
+        _from.takeFunds(amount)
+        _to.addFunds(amount)
 
     def exit(self):
         self.destroy()

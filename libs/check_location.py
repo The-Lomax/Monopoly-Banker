@@ -92,7 +92,7 @@ class CheckLocation(tk.Tk):
             return
 
         if len(self.game.locations[locName].discounts) > 0:
-            for player, pct in self.game.locations[locName].discounts:
+            for player, pct in self.game.locations[locName].discounts.items():
                 tk.Label(
                     self.thirdFrame,
                     text=f"{player} - {pct}%"
@@ -112,7 +112,7 @@ class CheckLocation(tk.Tk):
             )
 
         if len(self.game.locations[locName].rentSplits) > 0:
-            for player, pct in self.game.locations[locName].rentSplits:
+            for player, pct in self.game.locations[locName].rentSplits.items():
                 tk.Label(
                     self.fifthFrame,
                     text=f"{player} - {pct}%"

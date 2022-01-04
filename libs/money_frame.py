@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 
 class MoneyFrame(tk.Frame):
@@ -9,6 +9,7 @@ class MoneyFrame(tk.Frame):
         pad = 5
         self.game = game
         self.controller = container
+        self.dCB = False
 
         tk.Label(
             self,
@@ -37,7 +38,11 @@ class MoneyFrame(tk.Frame):
 
         self.dCheckBox = tk.Checkbutton(
             self,
-            text="Apply discount for: "
+            text="Apply discounts for: ",
+            variable=self.dCB,
+            onvalue=1,
+            offvalue=0,
+            command=self.toggleState
         )
         self.dCheckBox.grid(row=2, column=0, padx=pad, pady=pad)
 
@@ -47,18 +52,6 @@ class MoneyFrame(tk.Frame):
         )
         self.dBox.grid(row=2, column=1, padx=pad, pady=pad)
 
-        self.rsCheckBox = tk.Checkbutton(
-            self,
-            text="Apply split for: "
-        )
-        self.rsCheckBox.grid(row=3, column=0, padx=pad, pady=pad)
-
-        self.rsBox = ttk.Combobox(
-            self,
-            state="readonly"
-        )
-        self.rsBox.grid(row=3, column=1, padx=pad, pady=pad)
-
         self.mButton = tk.Button(
             self,
             text="Save",
@@ -66,24 +59,42 @@ class MoneyFrame(tk.Frame):
             command=self.moveMoney,
             width=pad * 2
         )
-        self.mButton.grid(row=4, column=0, columnspan=2, pady=pad)
+        self.mButton.grid(row=3, column=0, columnspan=2, pady=pad)
 
         self.pack(fill="both", expand=True, padx=pad, pady=pad)
 
-        self.pBox.bind("<<ComboboxSelected>>", self.loadPlayerRebates)
+        self.loadPlayerRebates()
+    
+    def toggleState(self):
+        self.dCB = not self.dCB
 
-    def loadPlayerRebates(self, event):
-        player = self.game.players[self.pBox.get()]
-        discList = [el[0] for el in player.discounts]
-        rsList = [el[0] for el in player.rentSplits]
-        self.dBox["values"] = discList
-        self.rsBox["values"] = rsList
+    def loadPlayerRebates(self):
+        locList = [el for el in self.game.locations.keys()]
+        self.dBox["values"] = locList
 
     def moveMoney(self):
-        target = self.game.players[self.pBox.get()]
+        _from = self.game.players[self.pBox.get()]
+        _to = self.controller.origin
+
         amt = int(self.aEntry.get())
 
-        self.controller.moveMoney(target, amt)
+        deduction = 0
+
+        # apply discount if valid
+        if self.dCB:
+            loc = self.dBox.get()
+            if loc == "":
+                messagebox.showerror("error", "Please select a location or uncheck the box.", parent=self)
+                return
+            pct = _from.checkRebate(_from.discounts, loc)
+            amt *= (100 - pct) / 100
+
+            for player, split in self.game.locations[loc].rentSplits.items():
+                splitAmt = amt * split // 100
+                self.controller.moveMoney(_from, self.game.players[player], splitAmt)
+                deduction += splitAmt
+
+        self.controller.moveMoney(_from, _to, amt - deduction)
 
         self.controller.controller.updateBadges()
 
