@@ -12,6 +12,7 @@ class PlayerInfo(tk.Tk):
         self.title(f"Player info: {self.player.name}")
         self.resizable(False, False)
         self.rowconfigure((0, 1, 2, 3, 4), weight=1)
+        self.minsize(200, 0)
 
         # Top row with balance
         self.mainFrame = tk.Frame(self)
