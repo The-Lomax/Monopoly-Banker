@@ -1,16 +1,23 @@
-import sqlite3, json, os
+import sqlite3
+import json
+import os
 from tkinter import messagebox
 from libs.player import Player
 from libs.location import Location
+from libs.house import House
+from libs.poi import POI
 from libs.gameData import locationsInfo, housesInfo, poiInfo
 
 
 class Game:
     def __init__(self):
         self.dbFile = "assets/game.sqlite"
+        self.mainWindow = None
         self.pCount = 0
         self.players = {}
         self.locations = {}
+        self.houses = {}
+        self.poi = {}
 
         # Check if database exists and create if does not exist
         if not os.path.isfile(self.dbFile):
@@ -20,36 +27,101 @@ class Game:
 
     def addPlayer(self, pId: int, pName: str, pBal: int, pBkrupt: bool) -> None:
         self.players[pName] = Player(pId, pName, pBal, pBkrupt)
+        self.pCount += 1
 
-    def addLocation(self, loc: str) -> None:
-        self.locations[loc] = Location(loc)
+    def createPlayer(self, pId: int, pName: str, pBal: int, pBkrupt: bool) -> None:
+        query = f"INSERT INTO players (id, name, balance, bankrupt) " \
+                f"VALUES ({pId}, '{pName}', {pBal}, {pBkrupt})"
+        self.dbExecute(query, False)
 
     def loadData(self):
-        self.loadPlayers()
-        self.loadLocations()
+        self.loadPlayersFromDB()
+        self.loadLocationsFromDB()
+        self.loadHousesFromDB()
+        self.loadPOIFromDB()
+
+    def addLocation(self, lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId) -> None:
+        self.locations[name] = Location(lId, name, buyPrice, json.loads(rent), mortgage, buildPrice, buildings, json.loads(rentSplits), json.loads(rentDiscounts), status, ownerId)
+
+    def addHouse(self, lId, name, buyPrice, rent, mortgage, status, ownerId):
+        self.houses[name] = House(lId, name, buyPrice, json.loads(rent), mortgage, status, ownerId)
+
+    def addPOI(self, lId, name, buyPrice, rent, mortgage, status, ownerId):
+        self.poi[name] = POI(lId, name, buyPrice, json.loads(rent), mortgage, status, ownerId)
+
+    def loadHousesFromDB(self):
+        query = "SELECT * FROM houses"
+        data = self.dbExecute(query, True)
+        self.updateHousesList(data)
+
+    def updateHousesList(self, list):
+        self.houses = {}
+        for el in list:
+            lId, name, buyPrice, rent, mortgage, status, ownerId = el
+            self.addHouse(lId, name, buyPrice, rent, mortgage, status, ownerId)
+
+    def loadPOIFromDB(self):
+        query = "SELECT * FROM poi"
+        data = self.dbExecute(query, True)
+        self.updatePOIList(data)
+
+    def updatePOIList(self, list):
+        self.poi = {}
+        for el in list:
+            lId, name, buyPrice, rent, mortgage, status, ownerId = el
+            self.addPOI(lId, name, buyPrice, rent, mortgage, status, ownerId)
     
-    def loadLocations(self):
-        query = "SELECT "
+    def loadLocationsFromDB(self):
+        query = "SELECT * FROM locations"
+        data = self.dbExecute(query, True)
+        self.updateLocationsList(data)
+
+    def updateLocationsList(self, list):
+        self.locations = {}
+        for el in list:
+            lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId = el
+            self.addLocation(lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId)
     
-    def loadPlayers(self):
+    def loadPlayersFromDB(self):
         query = "SELECT * FROM players"
         data = self.dbExecute(query, True)
-        for i in range(1, len(data)):
-            self.addPlayer(data[i][0], data[i][1], data[i][2], data[i][3])
-            self.pCount += 1
+        self.updatePlayersList(data)
+
+    def updatePlayersList(self, list):
+        self.players = {}
+        self.pCount = 0
+        for i in range(1, len(list)):
+            pId, pName, pBal, pBkrpt = list[i]
+            self.addPlayer(pId, pName, pBal, pBkrpt)
     
-    def center_app(self, container, *app_size: int):
-        """
-        used to center the position of opened windows. Returns formatted tkinter.geometry parameter
-
-        :param container: screen reference to get size in pixels
-        :param app_size: desired size of the window to create
-        :return: string containing size and position of window to create
-        """
-
+    def center(self, container, *app_size: int):
         return f"{app_size[0]}x{app_size[1]}+" + \
                f"{container.winfo_screenwidth() // 2 - app_size[0] // 2}+" + \
                f"{container.winfo_screenheight() // 2 - app_size[1] // 2}"
+
+    def resetGameState(self):
+        if messagebox.askyesno("Warning", "This will reset the game to default settings. Are you sure?", parent=self.mainWindow):
+            db = sqlite3.connect(self.dbFile)
+            cursor = db.cursor()
+
+            query = f"DELETE FROM players WHERE id>0"
+            cursor.execute(query)
+
+            query = f"UPDATE houses SET status='free', ownerId=0"
+            cursor.execute(query)
+
+            query = f"UPDATE poi SET status='free', ownerId=0"
+            cursor.execute(query)
+
+            query = f"UPDATE locations SET buildings=0, rentSplits='{json.dumps(dict())}', rentDiscounts='{json.dumps(dict())}', status='free', ownerId=0"
+            cursor.execute(query)
+
+            db.commit()
+            db.close()
+
+            self.loadData()
+            self.mainWindow.showModule(self.mainWindow.playersFrame)
+            self.mainWindow.playersFrame.loadPlayers()
 
     def buildDb(self):
         db = sqlite3.connect(self.dbFile)

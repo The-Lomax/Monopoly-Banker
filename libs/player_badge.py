@@ -1,19 +1,18 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-from libs.player_info import PlayerInfo
 from libs.add_money import AddMoney
 
 
 class PlayerBadge(tk.Frame):
-    def __init__(self, container, player, *args, **kwargs):
+    def __init__(self, container, game, player, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
 
-        self.controller = container
         self.player = player
+        self.game = game
 
         pad = 5
-        btnSize = 20
-        self.lFont = ("Helvetica", 14)
+        btnSize = 30
+        self.lFont = ("Helvetica", 24, "bold")
 
         # Images
         infoImg = Image.open("assets/info.png")
@@ -46,24 +45,13 @@ class PlayerBadge(tk.Frame):
         self.pBal.pack(side="left", padx=(pad, 0))
 
         # Buttons
-        self.infoBtn = tk.Button(
-            self,
-            command=self.openInfo
-        )
-        self.infoBtn["image"] = scaledInfoImg
-        self.infoBtn.image = scaledInfoImg
-        self.infoBtn.pack(side="left", padx=(pad, 0))
-
         self.addBtn = tk.Button(
             self,
-            command=self.addMoney
+            command=self.addEvent
         )
         self.addBtn["image"] = scaledAddImg
         self.addBtn.image = scaledAddImg
         self.addBtn.pack(side="left", padx=(pad, 0))
 
-    def openInfo(self):
-        PlayerInfo(self.player)
-
-    def addMoney(self):
-        AddMoney(self.controller, self.player)
+    def addEvent(self):
+        self.game.mainWindow.addEvent(self.player)

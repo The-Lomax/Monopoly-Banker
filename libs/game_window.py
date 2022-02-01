@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox
 from libs.menu import GameMenu
-from libs.playerFrame import PlayerFrame
+from libs.playerFrame import PlayerList
+from libs.add_player import AddPlayer
+from libs.addEvent import AddEvent
 
 
 class GameWindow(tk.Tk):
@@ -9,11 +11,12 @@ class GameWindow(tk.Tk):
         super().__init__(*args, **kwargs)
 
         self.game = game
+        self.game.mainWindow = self
 
         # window parameters
         self.title("Monopoly Banker")
         self.resizable(False, False)
-        self.geometry(self.game.center_app(self, *(640, 480)))
+        self.geometry(self.game.center(self, *(640, 480)))
 
         # menu setup
         self.menu = GameMenu(self)
@@ -24,7 +27,9 @@ class GameWindow(tk.Tk):
         self.mainFrame.pack(fill="both", expand="True", padx=5, pady=5)
 
         # players frame
-        self.playersFrame = tk.Frame(self)
+        self.playersFrame = PlayerList(self.mainFrame, self.game)
+        self.addPlayerFrame = AddPlayer(self.mainFrame, self.game)
+        self.addEventFrame = AddEvent(self.mainFrame, self.game)
 
         # DEBUGGING
 
@@ -35,20 +40,21 @@ class GameWindow(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self.safeExit)
 
         # run window
+        self.showModule(self.playersFrame)
         self.mainloop()
 
-    def updateBadges(self):
-        for el in self.mainFrame.winfo_children():
-            if el.winfo_class() == "Frame":
-                el.destroy()
+    def showModule(self, module):
+        self.hideAllFrames()
+        module.grid(row=0, column=0, sticky="new")
 
-        # create player badges
-        pad = 5
-        for name, player in self.game.players.items():
-            if not player.isBankrupt():
-                PlayerBadge(self, player).pack(fill="x", expand=True, padx=pad, pady=(pad, 0))
-        self.geometry(f"300x{30 * len(self.winfo_children()) + 50}")
+    def hideAllFrames(self):
+        for el in self.mainFrame.winfo_children():
+            el.grid_forget()
 
     def safeExit(self):
         if messagebox.askyesno("Warning", "Are you sure?", parent=self):
             self.destroy()
+
+    def addEvent(self, player):
+        self.showModule(self.addEventFrame)
+        self.addEventFrame.updateLabel(player)

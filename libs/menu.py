@@ -15,6 +15,8 @@ class GameMenu(tk.Menu):
 
         mGame.add_command(label="Add Player", command=self.openAddPlayerWindow)
         mGame.add_separator()
+        mGame.add_command(label="Reset Game", command=self.controller.game.resetGameState)
+        mGame.add_separator()
         mGame.add_command(label="Exit", command=self.controller.safeExit)
 
         mPlayer = tk.Menu(self, tearoff=0)
@@ -30,7 +32,7 @@ class GameMenu(tk.Menu):
         self.add_cascade(label="Location", menu=mLocation)
 
     def openAddPlayerWindow(self):
-        AddPlayer(self.controller, self.controller.game)
+        self.controller.showModule(self.controller.addPlayerFrame)
 
     def openAddDiscountWindow(self):
         AddDiscount(self.controller.game)

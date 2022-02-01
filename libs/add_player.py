@@ -2,26 +2,19 @@ import tkinter as tk
 from tkinter import messagebox
 
 
-class AddPlayer(tk.Tk):
-    def __init__(self, controller, game, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class AddPlayer(tk.Frame):
+    def __init__(self, container, game, *args, **kwargs):
+        super().__init__(container, *args, **kwargs)
 
         self.game = game
-        self.controller = controller
         pad = 5
 
-        # window parameters
-        self.title("Add Player")
-        self.resizable(False, False)
-
-        self.mainFrame = tk.Frame(self)
-        self.mainFrame.rowconfigure((0, 1, 2), weight=1)
-        self.mainFrame.columnconfigure((1, 2), weight=1)
-        self.mainFrame.pack()
+        self.rowconfigure((0, 1, 2), weight=1)
+        self.columnconfigure((1, 2), weight=1)
 
         # Labels
         tk.Label(
-            self.mainFrame,
+            self,
             text="Player name: "
         ).grid(
             row=0, column=0,
@@ -29,7 +22,7 @@ class AddPlayer(tk.Tk):
         )
 
         tk.Label(
-            self.mainFrame,
+            self,
             text="Starting balance: "
         ).grid(
             row=1, column=0,
@@ -37,15 +30,15 @@ class AddPlayer(tk.Tk):
         )
 
         # Entries
-        self.pName = tk.Entry(self.mainFrame, width=20)
+        self.pName = tk.Entry(self, width=20)
         self.pName.grid(row=0, column=1, sticky="new", padx=pad, pady=pad)
 
-        self.sBal = tk.Entry(self.mainFrame, width=20)
+        self.sBal = tk.Entry(self, width=20)
         self.sBal.grid(row=1, column=1, sticky="new", padx=pad, pady=pad)
 
         # Buttons
         self.addBtn = tk.Button(
-            self.mainFrame,
+            self,
             text="Add",
             command=self.addItem,
             width=5,
@@ -55,9 +48,6 @@ class AddPlayer(tk.Tk):
 
         # focus on window
         self.pName.focus_force()
-
-        # run window
-        self.mainloop()
 
     def addItem(self):
         name = self.pName.get()
@@ -70,6 +60,9 @@ class AddPlayer(tk.Tk):
             messagebox.showerror("error", "Check the balance!", parent=self)
             return
 
-        self.game.addPlayer(self.game.pCount + 1, name, bal, False)
-        self.controller.updateBadges()
-        self.destroy()
+        self.game.createPlayer(self.game.pCount + 1, name, bal, False)
+        self.pName.delete(0, "end")
+        self.sBal.delete(0, "end")
+        self.game.loadPlayersFromDB()
+        self.game.mainWindow.showModule(self.game.mainWindow.playersFrame)
+        self.game.mainWindow.playersFrame.loadPlayers()
