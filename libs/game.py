@@ -37,6 +37,19 @@ class Game:
         for i in range(1, len(data)):
             self.addPlayer(data[i][0], data[i][1], data[i][2], data[i][3])
             self.pCount += 1
+    
+    def center_app(self, container, *app_size: int):
+        """
+        used to center the position of opened windows. Returns formatted tkinter.geometry parameter
+
+        :param container: screen reference to get size in pixels
+        :param app_size: desired size of the window to create
+        :return: string containing size and position of window to create
+        """
+
+        return f"{app_size[0]}x{app_size[1]}+" + \
+               f"{container.winfo_screenwidth() // 2 - app_size[0] // 2}+" + \
+               f"{container.winfo_screenheight() // 2 - app_size[1] // 2}"
 
     def buildDb(self):
         db = sqlite3.connect(self.dbFile)

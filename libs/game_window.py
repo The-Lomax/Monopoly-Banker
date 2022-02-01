@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from libs.menu import GameMenu
-from libs.player_badge import PlayerBadge
+from libs.playerFrame import PlayerFrame
 
 
 class GameWindow(tk.Tk):
@@ -13,10 +13,15 @@ class GameWindow(tk.Tk):
         # window parameters
         self.title("Monopoly Banker")
         self.resizable(False, False)
+        self.geometry(self.game.center_app(self, *(640, 480)))
 
         # menu setup
         self.menu = GameMenu(self)
         self.config(menu=self.menu)
+
+        # main frame. This is the storage that will contain all the custom frames
+        self.mainFrame = tk.Frame(self)
+        self.mainFrame.pack(fill="both", expand="True", padx=5, pady=5)
 
         # players frame
         self.playersFrame = tk.Frame(self)
@@ -33,8 +38,7 @@ class GameWindow(tk.Tk):
         self.mainloop()
 
     def updateBadges(self):
-        # clear list
-        for el in self.winfo_children():
+        for el in self.mainFrame.winfo_children():
             if el.winfo_class() == "Frame":
                 el.destroy()
 
