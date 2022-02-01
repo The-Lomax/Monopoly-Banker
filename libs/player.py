@@ -1,40 +1,14 @@
 class Player:
-    def __init__(self, pName, pBal):
+    def __init__(self, pId, pName, pBal, pBkrupt):
+        self.id = pId
         self.name = pName
         self.balance = pBal
-        self.discounts = {}
-        self.rentSplits = {}
-        self.bankrupt = False
+        self.bankrupt = pBkrupt
 
-    def addFunds(self, amt: int):
+    def adjustBalance(self, amt: int):
         self.balance += amt
-
-    def takeFunds(self, amt: int):
-        self.balance -= amt
         if self.balance < 0:
             self.goBankrupt()
-
-    def addDiscount(self, percentage: int, location: str):
-        if location in self.discounts.keys():
-            self.discounts[location] += percentage
-        else:
-            self.discounts[location] = percentage
-        if self.discounts[location] > 100:
-            self.discounts[location] = 100
-
-    def addRentSplit(self, percentage: int, location: str):
-        if location in self.rentSplits.keys():
-            self.rentSplits[location] += percentage
-        else:
-            self.rentSplits[location] = percentage
-        if self.rentSplits[location] > 100:
-            self.rentSplits[location] = 100
-
-    def checkRebate(self, list, val):
-        if val in list.keys():
-            return list[val]
-        else:
-            return 0
 
     def isBankrupt(self) -> bool:
         if self.bankrupt:

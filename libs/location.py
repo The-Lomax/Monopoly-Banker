@@ -1,8 +1,8 @@
 class Location:
-    def __init__(self, lName):
+    def __init__(self, lName, lDiscounts, lSplits):
         self.name = lName
-        self.discounts = {}
-        self.rentSplits = {}
+        self.discounts = lDiscounts or {}
+        self.rentSplits = lSplits or {}
 
     def addDiscount(self, player, percentage):
         if player in self.discounts.keys():

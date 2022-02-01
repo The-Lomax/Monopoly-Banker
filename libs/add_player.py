@@ -70,6 +70,6 @@ class AddPlayer(tk.Tk):
             messagebox.showerror("error", "Check the balance!", parent=self)
             return
 
-        self.game.addPlayer(name, bal)
+        self.game.addPlayer(self.game.pCount + 1, name, bal, False)
         self.controller.updateBadges()
         self.destroy()
