@@ -42,3 +42,4 @@ class GameMenu(tk.Menu):
 
     def openLocationCheckWindow(self):
         CheckLocation(self.controller.game)
+    

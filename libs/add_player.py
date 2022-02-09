@@ -63,6 +63,6 @@ class AddPlayer(tk.Frame):
         self.game.createPlayer(self.game.pCount + 1, name, bal, False)
         self.pName.delete(0, "end")
         self.sBal.delete(0, "end")
-        self.game.loadPlayersFromDB()
+        self.game.loadPlayersFromWeb()
         self.game.mainWindow.showModule(self.game.mainWindow.playersFrame)
         self.game.mainWindow.playersFrame.loadPlayers()
