@@ -40,6 +40,7 @@ class AddEvent(tk.Frame):
             width=8,
             command=self.saveEvent
         )
+        self.saveButton.grid(row=2, column=0, columnspan=10)
 
         self.eventLocation.bind("<<ComboboxSelected>>", self.processEvent)
 
@@ -60,7 +61,7 @@ class AddEvent(tk.Frame):
 
     def saveEvent(self):
         #TODO data validation and processing and saving the event
-        pass
+        self.game.mainWindow.showModule(self.game.mainWindow.playersFrame)
 
     def updateLabel(self, player=None):
         if not player is None:

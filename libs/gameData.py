@@ -374,11 +374,3 @@ poiInfo = {
         "lOwnerId": 0
     },
 }
-
-# {
-#     "pId": 2,
-#     "pName": "John",
-#     "pBalance": 1400,
-#     "pBankrupt": false,
-#     "pType": "player"
-# }

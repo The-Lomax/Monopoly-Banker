@@ -1,8 +1,4 @@
 import tkinter as tk
-from libs.add_player import AddPlayer
-from libs.add_discount import AddDiscount
-from libs.add_rent_split import AddRentSplit
-from libs.check_location import CheckLocation
 
 
 class GameMenu(tk.Menu):
@@ -21,11 +17,14 @@ class GameMenu(tk.Menu):
 
         mPlayer = tk.Menu(self, tearoff=0)
         mPlayer.add_command(label="Add discount", command=self.openAddDiscountWindow)
-        mPlayer.add_separator()
         mPlayer.add_command(label="Add rent split", command=self.openAddRentSplitWindow)
 
         mLocation = tk.Menu(self, tearoff=0)
-        mLocation.add_command(label="Check...", command=self.openLocationCheckWindow)
+        mLocation.add_command(label="Inspect", command=self.inspectLocation)
+        mLocation.add_command(label="Build", command=self.buildLocation)
+        mLocation.add_command(label="Sell", command=self.sellLocation)
+        mLocation.add_command(label="Trade", command=self.tradeLocation)
+        mLocation.add_command(label="Mortgage", command=self.mortgageLocation)
 
         self.add_cascade(label="Game", menu=mGame)
         self.add_cascade(label="Player", menu=mPlayer)
@@ -35,11 +34,23 @@ class GameMenu(tk.Menu):
         self.controller.showModule(self.controller.addPlayerFrame)
 
     def openAddDiscountWindow(self):
-        AddDiscount(self.controller.game)
+        self.controller.showModule(self.controller.addDiscountFrame)
 
     def openAddRentSplitWindow(self):
-        AddRentSplit(self.controller.game)
+        self.controller.showModule(self.controller.addSplitFrame)
 
-    def openLocationCheckWindow(self):
-        CheckLocation(self.controller.game)
+    def inspectLocation(self):
+        self.controller.showModule(self.controller.locInspectFrame)
+    
+    def buildLocation(self):
+        self.controller.showModule(self.controller.buildFrame)
+    
+    def sellLocation(self):
+        self.controller.showModule(self.controller.sellFrame)
+    
+    def mortgageLocation(self):
+        self.controller.showModule(self.controller.mortgageFrame)
+    
+    def tradeLocation(self):
+        self.controller.showModule(self.controller.tradeLocFrame)
     

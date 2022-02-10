@@ -1,6 +1,5 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-from libs.add_money import AddMoney
 
 
 class PlayerBadge(tk.Frame):

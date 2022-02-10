@@ -26,7 +26,7 @@ class Game:
         }
 
         self.loadData()
-    
+
     def loadData(self):
         self.loadPlayersFromWeb()
         self.loadLocationsFromWeb()
@@ -176,6 +176,9 @@ class Game:
             headers=self.head
         )
     
+    def updateStatus(self, msg):
+        self.mainWindow.statusLabel.configure(text="status: " + msg)
+
     def center(self, container, *app_size: int):
         return f"{app_size[0]}x{app_size[1]}+" + \
                f"{container.winfo_screenwidth() // 2 - app_size[0] // 2}+" + \
@@ -211,6 +214,7 @@ class Game:
             for el in self.players.values():
                 self.deletePlayer(el.id)
 
+            self.players = {}
             self.pCount = 0
 
             self.loadData()

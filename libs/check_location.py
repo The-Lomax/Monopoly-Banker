@@ -3,16 +3,14 @@ from tkinter import ttk
 from tkinter import messagebox
 
 
-class CheckLocation(tk.Tk):
-    def __init__(self, game, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class CheckLocation(tk.Frame):
+    def __init__(self, container, game, *args, **kwargs):
+        super().__init__(container, *args, **kwargs)
 
         self.game = game
         self.pad = 5
 
         # window parameters
-        self.title("Check Location")
-        self.resizable(False, False)
         self.rowconfigure((0, 1, 2, 3, 4), weight=1)
 
         # Top row with combobox and button
@@ -65,14 +63,21 @@ class CheckLocation(tk.Tk):
         self.fifthFrame = tk.Frame(self)
         self.fifthFrame.grid(row=4, column=0, sticky="new", padx=self.pad, pady=self.pad)
 
+        # exit button
+        tk.Button(
+            self,
+            text="exit",
+            width=5,
+            padx=5,
+            pady=5,
+            command=self.exitFrame
+        ).grid(row=5, column=0, columnspan=10, padx=5, pady=5)
+
         # read locations into the combobox
         self.readLocations()
-
-        # focus on window
-        self.focus_force()
-
-        # run window
-        self.mainloop()
+    
+    def exitFrame(self):
+        self.game.mainWindow.showModule(self.game.mainWindow.playersFrame)
 
     def readLocations(self):
         keys = [el for el in self.game.locations.keys()]
