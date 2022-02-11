@@ -30,18 +30,18 @@ class RentAdjustmentFrame(tk.Frame):
         self.locBox = ttk.Combobox(self, width=20)
         self.locBox.grid(row=2, column=1, padx=pad)
         self.locBox.configure(state="readonly")
-        self.locBox["values"] = [el for el in self.game.locations.keys()]
 
         # Buttons
         self.addBtn = tk.Button(self, text="Add", width=pad)
         self.addBtn.configure(command=self.addItem)
         self.addBtn.grid(row=3, column=0, columnspan=2, pady=pad)
 
-        # read players to list
-        self.readPlayers()
+        # update data
+        self.updateInfo()
 
-    def readPlayers(self):
+    def updateInfo(self):
         self.pBox['values'] = [el for el in self.game.players.keys()]
+        self.locBox["values"] = [el.name for el in self.game.locations.values() if not el.status == "free"]
 
     def getPName(self):
         return self.pBox.get()
@@ -56,33 +56,32 @@ class RentAdjustmentFrame(tk.Frame):
         return self.locBox.get()
 
     def addItem(self):
-        name = self.mainFrame.getPName()
-        pct = self.mainFrame.getPct()
-        loc = self.mainFrame.getLoc()
+        name = self.getPName()
+        if name == "": return messagebox.showerror("error", f"Player not selected.", parent=self)
 
-        res = 0
-        if loc in self.game.locations.keys():
+        pct = self.getPct()
+        if pct <= 0: return messagebox.showerror("error", f"Discount must be greater than 0%.", parent=self)
+
+        loc = self.getLoc()
+
+        if self.game.players[name].id == self.game.locations[loc].ownerId:
+            return messagebox.showerror("error", f"Cannot add discount/split for the location owner.", parent=self)
+
+        if self.mode == "discount":
+            self.game.locations[loc].addDiscount(name, pct)
+        elif self.mode == "split":
+            res = 0
             for el in self.game.locations[loc].rentSplits.values():
                 res += el
+                
+            if res + pct > 100:
+                return messagebox.showerror("error", f"Collective rent split cannot be higher than 100%. Your limit is {100 - res}%. Correct the split amount.", parent=self)
             
-        if res + pct > 100:
-            messagebox.showerror("error", f"Collective rent split cannot be higher than 100%. Your limit is {100 - res}%. Correct the split amount.")
-            return
-
-        self.game.players[name].addRentSplit(pct, loc)
-        if loc not in self.game.locations.keys():
-            self.game.addLocation(loc)
-        self.game.locations[loc].addRentSplit(name, pct)
-        self.destroy()
-
-
-    def addItem(self):
-        name = self.mainFrame.getPName()
-        pct = self.mainFrame.getPct()
-        loc = self.mainFrame.getLoc()
-
-        self.game.players[name].addDiscount(pct, loc)
-        if loc not in self.game.locations.keys():
-            self.game.addLocation(loc)
-        self.game.locations[loc].addDiscount(name, pct)
-        self.destroy()
+            self.game.locations[loc].addRentSplit(name, pct)
+        
+        # clean up
+        self.pBox.set("")
+        self.locBox.set("")
+        self.pctBox.delete(0, "end")
+        
+        self.game.returnToMain()

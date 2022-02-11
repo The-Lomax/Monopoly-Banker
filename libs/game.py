@@ -50,6 +50,10 @@ class Game:
                 "pBankrupt": pBkrupt
             }
         )
+    
+    def returnToMain(self):
+        self.mainWindow.playersFrame.loadPlayers()
+        self.mainWindow.showModule(self.mainWindow.playersFrame)
 
     def addLocation(self, lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId) -> None:
         self.locations[name] = Location(lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId)

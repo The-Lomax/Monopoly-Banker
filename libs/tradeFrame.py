@@ -91,5 +91,5 @@ class TradeFrame(tk.Frame):
         ).grid(row=2, column=0, columnspan=3, padx=5, pady=5)
 
     def saveTrade(self):
-        self.game.mainWindow.showModule(self.game.mainWindow.playersFrame)
+        self.game.returnToMain()
     

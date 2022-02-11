@@ -30,15 +30,17 @@ class GameMenu(tk.Menu):
         self.add_cascade(label="Game", menu=mGame)
         self.add_cascade(label="Player", menu=mPlayer)
         self.add_cascade(label="Location", menu=mLocation)
-        self.add_command(label="Return to main", command=self.returnToMain)
+        self.add_command(label="Return to main", command=self.controller.game.returnToMain)
 
     def openAddPlayerWindow(self):
         self.controller.showModule(self.controller.addPlayerFrame)
 
     def openAddDiscountWindow(self):
+        self.controller.addDiscountFrame.updateInfo()
         self.controller.showModule(self.controller.addDiscountFrame)
 
     def openAddRentSplitWindow(self):
+        self.controller.addSplitFrame.updateInfo()
         self.controller.showModule(self.controller.addSplitFrame)
 
     def inspectLocation(self):
@@ -62,8 +64,4 @@ class GameMenu(tk.Menu):
     def bulldozeLocation(self):
         self.controller.bulldozeLocationFrame.refreshData()
         self.controller.showModule(self.controller.bulldozeLocationFrame)
-    
-    def returnToMain(self):
-        self.controller.playersFrame.loadPlayers()
-        self.controller.showModule(self.controller.playersFrame)
     
