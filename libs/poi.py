@@ -1,5 +1,9 @@
+from operator import lt
+
+
 class POI:
-    def __init__(self, lId, name, buyPrice, rent, mortgage, status, ownerId):
+    def __init__(self, lType, lId, name, buyPrice, rent, mortgage, status, ownerId):
+        self.type = lType
         self.id = lId
         self.name = name
         self.buyPrice = buyPrice

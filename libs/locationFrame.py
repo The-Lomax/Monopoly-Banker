@@ -64,6 +64,9 @@ class LocationFrame(tk.Frame):
         # stop executing the function if location not selected
         if location == "": return messagebox.showerror("error", "Select a location.", parent=self)
 
+        # assign location object
+        loc = self.game.locations[location]
+
         # process the event
         if self.mode == "build":
             # read number of buildings
@@ -73,7 +76,7 @@ class LocationFrame(tk.Frame):
                 buildAmt = 0
             
             # build number of items on the location
-            self.game.locations[location].build(self.game.players, buildAmt)
+            loc.build(self.game.players, buildAmt)
         elif self.mode == "bulldoze":
             # read number of buildings
             try:
@@ -82,7 +85,7 @@ class LocationFrame(tk.Frame):
                 buildAmt = 0
             
             # bulldoze number of items on the location
-            self.game.locations[location].bulldoze(self.game.players, buildAmt)
+            loc.bulldoze(self.game.players, buildAmt)
         elif self.mode == "sell":
             # read player information from the list
             buyer = self.pList.get()
@@ -90,15 +93,23 @@ class LocationFrame(tk.Frame):
             # stop executing if player not selected
             if buyer == "": return messagebox.showerror("error", "Select a player.", parent=self)
 
+            #
+            buyer = self.game.players[buyer]
+
             # process the event
-            self.game.players[buyer].buy(self.game.locations[location])
+            buyer.buy(self.game.locations[location])
+
+            self.game.savePlayerInfo(buyer)
         else:  # mortgage
-            self.game.locations[location].toggleMortgage(self.game.players)
+            loc.toggleMortgage(self.game.players)
 
         # return back to the player list
         self.locBox.set("")
         self.pBox.delete(0, "end")
         self.pList.set("")
+
+        self.game.saveLocationInfo(loc)
+
         self.game.mainWindow.playersFrame.loadPlayers()
         self.game.mainWindow.showModule(self.game.mainWindow.playersFrame)
     

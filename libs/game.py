@@ -51,18 +51,66 @@ class Game:
             }
         )
     
+    def savePlayerInfo(self, player):
+        self.createPlayer(player.id, player.name, player.balance, player.bankrupt)
+    
+    def saveLocationInfo(self, location):
+        if location.name in self.locations.keys():
+            if location.discounts == {}:
+                ds = ""
+            else:
+                ds = location.discounts
+            if location.rentSplits == {}:
+                rs = ""
+            else:
+                rs = location.rentSplits
+            js = {
+                "lType": location.type,
+                "lId": location.id,
+                "lName": location.name,
+                "lBuyPrice": location.buyPrice,
+                "lRent": location.rent,
+                "lMortgage": location.mortgage,
+                "lBuildPrice": location.buildPrice,
+                "lBuildings": location.buildings,
+                "lRentSplits": ds,
+                "lRentDiscounts": rs,
+                "lStatus": location.status,
+                "lOwnerId": location.ownerId
+            }
+        else:
+            js = {
+                "lType": location.type,
+                "lId": location.id,
+                "lName": location.name,
+                "lBuyPrice": location.buyPrice,
+                "lRent": location.rent,
+                "lMortgage": location.mortgage,
+                "lStatus": location.status,
+                "lOwnerId": location.ownerId
+            }
+        
+        if js == "": return messagebox.showerror("error", "Could not parse the object.")
+
+        requests.request(
+            'PUT', 
+            self.buildAPIURL("locations"),
+            headers=self.head,
+            json=js
+        )
+    
     def returnToMain(self):
         self.mainWindow.playersFrame.loadPlayers()
         self.mainWindow.showModule(self.mainWindow.playersFrame)
 
-    def addLocation(self, lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId) -> None:
-        self.locations[name] = Location(lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId)
+    def addLocation(self, lType, lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId) -> None:
+        self.locations[name] = Location(lType, lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId)
 
-    def addHouse(self, lId, name, buyPrice, rent, mortgage, status, ownerId):
-        self.houses[name] = House(lId, name, buyPrice, rent, mortgage, status, ownerId)
+    def addHouse(self, lType, lId, name, buyPrice, rent, mortgage, status, ownerId):
+        self.houses[name] = House(lType, lId, name, buyPrice, rent, mortgage, status, ownerId)
 
-    def addPOI(self, lId, name, buyPrice, rent, mortgage, status, ownerId):
-        self.poi[name] = POI(lId, name, buyPrice, rent, mortgage, status, ownerId)
+    def addPOI(self, lType, lId, name, buyPrice, rent, mortgage, status, ownerId):
+        self.poi[name] = POI(lType, lId, name, buyPrice, rent, mortgage, status, ownerId)
 
     def loadHousesFromWeb(self):
         housesList = []
@@ -73,6 +121,7 @@ class Game:
         data = data.json()
         for el in data:
             housesList.append([
+                el["lType"]["S"],
                 int(el["lId"]["N"]),
                 str(el["lName"]["S"]),
                 int(el["lBuyPrice"]["N"]),
@@ -86,8 +135,8 @@ class Game:
     def updateHousesList(self, list):
         self.houses = {}
         for el in list:
-            lId, name, buyPrice, rent, mortgage, status, ownerId = el
-            self.addHouse(lId, name, buyPrice, rent, mortgage, status, ownerId)
+            lType, lId, name, buyPrice, rent, mortgage, status, ownerId = el
+            self.addHouse(lType, lId, name, buyPrice, rent, mortgage, status, ownerId)
 
     def loadPOIFromWeb(self):
         poiList = []
@@ -98,6 +147,7 @@ class Game:
         data = data.json()
         for el in data:
             poiList.append([
+                el["lType"]["S"],
                 int(el["lId"]["N"]),
                 str(el["lName"]["S"]),
                 int(el["lBuyPrice"]["N"]),
@@ -111,8 +161,8 @@ class Game:
     def updatePOIList(self, list):
         self.poi = {}
         for el in list:
-            lId, name, buyPrice, rent, mortgage, status, ownerId = el
-            self.addPOI(lId, name, buyPrice, rent, mortgage, status, ownerId)
+            lType, lId, name, buyPrice, rent, mortgage, status, ownerId = el
+            self.addPOI(lType, lId, name, buyPrice, rent, mortgage, status, ownerId)
     
     def loadLocationsFromWeb(self):
         locationsList = []
@@ -133,6 +183,7 @@ class Game:
             else:
                 rd = el["lRentDiscounts"]["S"]
             locationsList.append([
+                el["lType"]["S"],
                 int(el["lId"]["N"]),
                 str(el["lName"]["S"]),
                 int(el["lBuyPrice"]["N"]),
@@ -149,8 +200,8 @@ class Game:
     def updateLocationsList(self, list):
         self.locations = {}
         for el in list:
-            lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId = el
-            self.addLocation(lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId)
+            lType, lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId = el
+            self.addLocation(lType, lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId)
     
     def loadPlayersFromWeb(self):
         playerList = []
@@ -182,11 +233,6 @@ class Game:
     
     def updateStatus(self, msg):
         self.mainWindow.statusLabel.configure(text="status: " + msg)
-
-    def center(self, container, *app_size: int):
-        return f"{app_size[0]}x{app_size[1]}+" + \
-               f"{container.winfo_screenwidth() // 2 - app_size[0] // 2}+" + \
-               f"{container.winfo_screenheight() // 2 - app_size[1] // 2}"
 
     def resetGameState(self):
         if messagebox.askyesno("Warning", "This will reset the game to default settings. Are you sure?", parent=self.mainWindow):

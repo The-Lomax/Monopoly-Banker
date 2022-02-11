@@ -64,24 +64,29 @@ class RentAdjustmentFrame(tk.Frame):
 
         loc = self.getLoc()
 
-        if self.game.players[name].id == self.game.locations[loc].ownerId:
+        # assign location object
+        loc = self.game.locations[loc]
+
+        if self.game.players[name].id == loc.ownerId:
             return messagebox.showerror("error", f"Cannot add discount/split for the location owner.", parent=self)
 
         if self.mode == "discount":
-            self.game.locations[loc].addDiscount(name, pct)
+            loc.addDiscount(name, pct)
         elif self.mode == "split":
             res = 0
-            for el in self.game.locations[loc].rentSplits.values():
+            for el in loc.rentSplits.values():
                 res += el
                 
             if res + pct > 100:
                 return messagebox.showerror("error", f"Collective rent split cannot be higher than 100%. Your limit is {100 - res}%. Correct the split amount.", parent=self)
             
-            self.game.locations[loc].addRentSplit(name, pct)
+            loc.addRentSplit(name, pct)
         
         # clean up
         self.pBox.set("")
         self.locBox.set("")
         self.pctBox.delete(0, "end")
+
+        self.game.saveLocationInfo(loc)
         
         self.game.returnToMain()

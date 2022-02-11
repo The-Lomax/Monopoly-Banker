@@ -187,6 +187,9 @@ class AddEvent(tk.Frame):
         self.eventEntry.delete(0, "end")
         self.eventVar.set(False)
 
+        self.game.savePlayerInfo(guest)
+        self.game.savePlayerInfo(owner)
+
         self.game.returnToMain()
 
     def updateLabel(self, player=None):

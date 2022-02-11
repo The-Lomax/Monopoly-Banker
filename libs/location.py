@@ -2,7 +2,8 @@ from tkinter import messagebox
 
 
 class Location:
-    def __init__(self, lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId):
+    def __init__(self, lType, lId, name, buyPrice, rent, mortgage, buildPrice, buildings, rentSplits, rentDiscounts, status, ownerId):
+        self.type = lType
         self.id = lId
         self.name = name
         self.buyPrice = buyPrice
@@ -28,6 +29,9 @@ class Location:
             self.rentSplits[player] += percentage
         else:
             self.rentSplits[player] = percentage
+    
+    def setOwnership(self, player):
+        self.ownerId = player.id
     
     def build(self, players, amt):
         # check building lots available

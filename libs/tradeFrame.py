@@ -1,6 +1,5 @@
-from distutils import command
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 
 class TradeFrame(tk.Frame):
@@ -11,6 +10,9 @@ class TradeFrame(tk.Frame):
 
         self.p1Var = tk.BooleanVar()
         self.p2Var = tk.BooleanVar()
+
+        self.p1 = None
+        self.p2 = None
 
         tk.Label(
             self,
@@ -28,7 +30,7 @@ class TradeFrame(tk.Frame):
             text="P1: "
         ).grid(row=0, column=0)
 
-        self.p1Box = ttk.Combobox(self.leftSide, width=5)
+        self.p1Box = ttk.Combobox(self.leftSide, width=10, state="readonly")
         self.p1Box.grid(row=0, column=1)
 
         tk.Label(
@@ -36,7 +38,7 @@ class TradeFrame(tk.Frame):
             text="loc: "
         ).grid(row=1, column=0)
 
-        self.p1Loc = ttk.Combobox(self.leftSide, width=5)
+        self.p1Loc = ttk.Combobox(self.leftSide, width=10, state="readonly")
         self.p1Loc.grid(row=1, column=1)
 
         self.m1Check = tk.Checkbutton(
@@ -61,7 +63,7 @@ class TradeFrame(tk.Frame):
             text="P2: "
         ).grid(row=0, column=0)
 
-        self.p2Box = ttk.Combobox(self.rightSide, width=5)
+        self.p2Box = ttk.Combobox(self.rightSide, width=10, state="readonly")
         self.p2Box.grid(row=0, column=1)
 
         tk.Label(
@@ -69,7 +71,7 @@ class TradeFrame(tk.Frame):
             text="loc: "
         ).grid(row=1, column=0)
 
-        self.p2Loc = ttk.Combobox(self.rightSide, width=5)
+        self.p2Loc = ttk.Combobox(self.rightSide, width=10, state="readonly")
         self.p2Loc.grid(row=1, column=1)
 
         self.m2Check = tk.Checkbutton(
@@ -90,6 +92,91 @@ class TradeFrame(tk.Frame):
             command=self.saveTrade
         ).grid(row=2, column=0, columnspan=3, padx=5, pady=5)
 
+        self.p1Box.bind("<<ComboboxSelected>>", self.loadP1Locations)
+        self.p2Box.bind("<<ComboboxSelected>>", self.loadP2Locations)
+
+        self.updatePlayerLists()
+
     def saveTrade(self):
+        # exit if players not selected
+        if self.p1Box.get() == "" or self.p2Box.get() == "": return messagebox.showerror("error", "Players not selected.", parent=self)
+
+        # swap locations if selected
+        loc1 = self.p1Loc.get()
+        if not loc1 == "":
+            loc1 = self.game.locations[loc1]
+            loc1.setOwnership(self.p2)
+        
+        loc2 = self.p2Loc.get()
+        if not loc2 == "":
+            loc2 = self.game.locations[loc2]
+            loc2.setOwnership(self.p1)
+        
+        # check if money is involved and process payments
+        m1money = 0
+        m2money = 0
+        if self.p1Var:
+            try:
+                m1money = int(self.m1Box.get())
+            except ValueError:
+                m1money = 0
+            
+            if m1money > 0:
+                if self.p1.balance < m1money: return messagebox.showerror("error", "Insufficient balance: Player 1.", parent=self)
+        
+        if self.p1Var:
+            try:
+                m2money = int(self.m1Box.get())
+            except ValueError:
+                m2money = 0
+            
+            if m2money > 0:
+                if self.p2.balance < m2money: return messagebox.showerror("error", "Insufficient balance: Player 2.", parent=self)
+
+        difference = m1money - m2money
+        if difference > 0:
+            self.p2.adjustBalance(difference)
+        elif difference < 0:
+            self.p1.adjustBalance(difference)
+        
+        if not self.p1 == None:
+            self.game.updatePlayerInfo(self.p1)
+        if not self.p2 == None:
+            self.game.updatePlayerInfo(self.p2)
+
+        if not loc1 == "":
+            self.game.updateLocationInfo(loc1)
+        if not loc1 == "":
+            self.game.updateLocationInfo(loc2)
+
+        # clean up
+        self.p1 = None
+        self.p2 = None
+        self.p1Var.set(False)
+        self.p2Var.set(False)
+        self.p1Box.set("")
+        self.p2Box.set("")
+        self.m1Box.delete(0, "end")
+        self.m2Box.delete(0, "end")
+
         self.game.returnToMain()
     
+    def updatePlayerLists(self):
+        self.p1Box["values"] = [el for el in self.game.players.keys()]
+        self.p2Box["values"] = [el for el in self.game.players.keys()]
+    
+    def loadP1Locations(self, e):
+        name = self.p1Box.get()
+
+        if name == "": return messagebox.showerror("error", "Player 1 name empty.", parent=self)
+
+        self.p1 = self.game.players[name]
+        self.p1Loc["values"] = [el.name for el in self.game.locations.values() if el.ownerId == self.p1.id]
+
+    def loadP2Locations(self, e):
+        name = self.p2Box.get()
+
+        if name == "": return messagebox.showerror("error", "Player 2 name empty.", parent=self)
+
+        self.p2 = self.game.players[name]
+        self.p2Loc["values"] = [el.name for el in self.game.locations.values() if el.ownerId == self.p2.id]

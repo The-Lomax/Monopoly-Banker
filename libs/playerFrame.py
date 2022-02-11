@@ -21,6 +21,6 @@ class PlayerList(tk.Frame):
 
         # recreate player badges
         pad = 5
-        for name, player in self.game.players.items():
+        for player in self.game.players.values():
             if not player.isBankrupt():
                 PlayerBadge(self, self.game, player).pack(fill="x", expand=True, padx=pad, pady=(pad, 0))

@@ -20,7 +20,6 @@ class GameWindow(tk.Tk):
         # window parameters
         self.title("Monopoly Banker")
         self.resizable(False, False)
-        self.geometry(self.game.center(self, *(640, 480)))
         self.rowconfigure(0, weight=1)
 
         # menu setup
