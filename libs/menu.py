@@ -22,6 +22,7 @@ class GameMenu(tk.Menu):
         mLocation = tk.Menu(self, tearoff=0)
         mLocation.add_command(label="Inspect", command=self.inspectLocation)
         mLocation.add_command(label="Build", command=self.buildLocation)
+        mLocation.add_command(label="Bulldoze", command=self.bulldozeLocation)
         mLocation.add_command(label="Sell", command=self.sellLocation)
         mLocation.add_command(label="Trade", command=self.tradeLocation)
         mLocation.add_command(label="Mortgage", command=self.mortgageLocation)
@@ -29,6 +30,7 @@ class GameMenu(tk.Menu):
         self.add_cascade(label="Game", menu=mGame)
         self.add_cascade(label="Player", menu=mPlayer)
         self.add_cascade(label="Location", menu=mLocation)
+        self.add_command(label="Return to main", command=self.returnToMain)
 
     def openAddPlayerWindow(self):
         self.controller.showModule(self.controller.addPlayerFrame)
@@ -43,14 +45,25 @@ class GameMenu(tk.Menu):
         self.controller.showModule(self.controller.locInspectFrame)
     
     def buildLocation(self):
+        self.controller.buildFrame.refreshData()
         self.controller.showModule(self.controller.buildFrame)
     
     def sellLocation(self):
+        self.controller.sellFrame.refreshData()
         self.controller.showModule(self.controller.sellFrame)
     
     def mortgageLocation(self):
+        self.controller.mortgageFrame.refreshData()
         self.controller.showModule(self.controller.mortgageFrame)
     
     def tradeLocation(self):
         self.controller.showModule(self.controller.tradeLocFrame)
+    
+    def bulldozeLocation(self):
+        self.controller.bulldozeLocationFrame.refreshData()
+        self.controller.showModule(self.controller.bulldozeLocationFrame)
+    
+    def returnToMain(self):
+        self.controller.playersFrame.loadPlayers()
+        self.controller.showModule(self.controller.playersFrame)
     

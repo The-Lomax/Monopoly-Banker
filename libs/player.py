@@ -1,3 +1,6 @@
+from tkinter import messagebox
+
+
 class Player:
     def __init__(self, pId, pName, pBal, pBkrupt):
         self.id = pId
@@ -18,3 +21,14 @@ class Player:
 
     def goBankrupt(self) -> None:
         self.bankrupt = True
+    
+    def buy(self, location):
+        # check if location is free and if not, stop executing
+        if not location.status == "free": return messagebox.showerror("error", "Location is not available.")
+
+        # check if buyer has sufficient funds and if not, stop executing
+        if not self.balance >= location.buyPrice: return messagebox.showerror("error", "Insufficient funds.")
+
+        self.adjustBalance(-location.buyPrice)
+        location.status = "active"
+        location.ownerId = self.id

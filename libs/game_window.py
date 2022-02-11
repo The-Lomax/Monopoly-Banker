@@ -1,14 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
-from libs.add_discount import AddDiscount
-from libs.add_rent_split import AddRentSplit
+from libs.addPlayer import AddPlayer
+from libs.addEvent import AddEvent
+from libs.checkLocation import CheckLocation
+from libs.locationFrame import LocationFrame
 from libs.menu import GameMenu
 from libs.playerFrame import PlayerList
-from libs.add_player import AddPlayer
-from libs.addEvent import AddEvent
-from libs.locationFrame import LocationFrame
+from libs.rentAdjustment import RentAdjustmentFrame
 from libs.tradeFrame import TradeFrame
-from libs.check_location import CheckLocation
 
 
 class GameWindow(tk.Tk):
@@ -52,8 +51,9 @@ class GameWindow(tk.Tk):
         self.mortgageFrame = LocationFrame(self.mainFrame, self.game, "mortgage")
         self.tradeLocFrame = TradeFrame(self.mainFrame, self.game)
         self.locInspectFrame = CheckLocation(self.mainFrame, self.game)
-        self.addDiscountFrame = AddDiscount(self.mainFrame, self.game)
-        self.addSplitFrame = AddRentSplit(self.mainFrame, self.game)
+        self.addDiscountFrame = RentAdjustmentFrame(self.mainFrame, self.game, "discount")
+        self.addSplitFrame = RentAdjustmentFrame(self.mainFrame, self.game, "split")
+        self.bulldozeLocationFrame = LocationFrame(self.mainFrame, self.game, "bulldoze")
 
         # DEBUGGING
 

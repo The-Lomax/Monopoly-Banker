@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 
 
 class LocationFrame(tk.Frame):
@@ -23,6 +23,7 @@ class LocationFrame(tk.Frame):
         ).grid(row=1, column=0, padx=5, pady=5)
 
         self.locBox = ttk.Combobox(self)
+        self.locBox["state"] = "readonly"
         self.locBox.grid(row=1, column=1, padx=5, pady=5)
 
         self.pLabel = tk.Label(
@@ -33,16 +34,17 @@ class LocationFrame(tk.Frame):
 
         self.pBox = tk.Entry(self, width=10)
 
-        self.pCheckbox = ttk.Combobox(self, width=10)
+        self.pList = ttk.Combobox(self, width=10)
+        self.pList["state"] = "readonly"
 
         if not self.mode == "mortgage":
             self.pLabel.grid(row=2, column=0, padx=5, pady=5)
-            if self.mode == "build":
+            if self.mode == "build" or self.mode == "bulldoze":
                 self.pLabel.configure(text="#: ")
                 self.pBox.grid(row=2, column=1, padx=5, pady=5)
             elif self.mode == "sell":
                 self.pLabel.configure(text="Player: ")
-                self.pCheckbox.grid(row=2, column=1, padx=5, pady=5)
+                self.pList.grid(row=2, column=1, padx=5, pady=5)
 
         self.saveBtn = tk.Button(
             self,
@@ -56,8 +58,57 @@ class LocationFrame(tk.Frame):
         self.refreshData()
 
     def saveEvent(self):
+        # read location name from the checkbox
+        location = self.locBox.get()
+
+        # stop executing the function if location not selected
+        if location == "": return messagebox.showerror("error", "Select a location.", parent=self)
+
+        # process the event
+        if self.mode == "build":
+            # read number of buildings
+            try:
+                buildAmt = int(self.pBox.get())
+            except ValueError:
+                buildAmt = 0
+            
+            # build number of items on the location
+            self.game.locations[location].build(self.game.players, buildAmt)
+        elif self.mode == "bulldoze":
+            # read number of buildings
+            try:
+                buildAmt = int(self.pBox.get())
+            except ValueError:
+                buildAmt = 0
+            
+            # bulldoze number of items on the location
+            self.game.locations[location].bulldoze(self.game.players, buildAmt)
+        elif self.mode == "sell":
+            # read player information from the list
+            buyer = self.pList.get()
+
+            # stop executing if player not selected
+            if buyer == "": return messagebox.showerror("error", "Select a player.", parent=self)
+
+            # process the event
+            self.game.players[buyer].buy(self.game.locations[location])
+        else:  # mortgage
+            self.game.locations[location].toggleMortgage(self.game.players)
+
+        # return back to the player list
+        self.locBox.set("")
+        self.pBox.delete(0, "end")
+        self.pList.set("")
+        self.game.mainWindow.playersFrame.loadPlayers()
         self.game.mainWindow.showModule(self.game.mainWindow.playersFrame)
     
     def refreshData(self):
-        self.locBox["values"] = [el.name for el in self.game.locations.values()] + [el.name for el in self.game.houses.values()] + [el.name for el in self.game.poi.values()]
-        self.pCheckbox["values"] = [el.name for el in self.game.players.values()]
+        if self.mode == "build":
+            self.locBox["values"] = [el.name for el in self.game.locations.values() if el.status == "active"]
+        elif self.mode == "bulldoze":
+            self.locBox["values"] = [el.name for el in self.game.locations.values() if el.buildings > 0]
+        elif self.mode == "sell":
+            self.locBox["values"] = [el.name for el in self.game.locations.values() if el.status == "free"] + [el.name for el in self.game.houses.values() if el.status == "free"] + [el.name for el in self.game.poi.values() if el.status == "free"]
+            self.pList["values"] = [el.name for el in self.game.players.values()]
+        else:  # mortgage
+            self.locBox["values"] = [el.name for el in self.game.locations.values() if el.status == "active" or el.status == "mortgaged"] + [el.name for el in self.game.houses.values() if el.status == "active" or el.status == "mortgaged"] + [el.name for el in self.game.poi.values() if el.status == "active" or el.status == "mortgaged"]

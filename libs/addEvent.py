@@ -42,9 +42,9 @@ class AddEvent(tk.Frame):
         )
         self.saveButton.grid(row=2, column=0, columnspan=10)
 
-        self.eventLocation.bind("<<ComboboxSelected>>", self.processEvent)
+        self.eventLocation.bind("<<ComboboxSelected>>", self.updateScreen)
 
-    def processEvent(self, e):
+    def updateScreen(self, e):
         if self.eventLocation.get() == "location":
             self.eventDestination['values'] = [el for el in self.game.locations.keys()]
         elif self.eventLocation.get() == "house":
