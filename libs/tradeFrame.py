@@ -95,7 +95,7 @@ class TradeFrame(tk.Frame):
         self.p1Box.bind("<<ComboboxSelected>>", self.loadP1Locations)
         self.p2Box.bind("<<ComboboxSelected>>", self.loadP2Locations)
 
-        self.updatePlayerLists()
+        self.savePlayerLists()
 
     def saveTrade(self):
         # exit if players not selected
@@ -115,7 +115,7 @@ class TradeFrame(tk.Frame):
         # check if money is involved and process payments
         m1money = 0
         m2money = 0
-        if self.p1Var:
+        if self.p1Var.get() == True:
             try:
                 m1money = int(self.m1Box.get())
             except ValueError:
@@ -124,30 +124,29 @@ class TradeFrame(tk.Frame):
             if m1money > 0:
                 if self.p1.balance < m1money: return messagebox.showerror("error", "Insufficient balance: Player 1.", parent=self)
         
-        if self.p1Var:
+        if self.p2Var.get() == True:
             try:
-                m2money = int(self.m1Box.get())
+                m2money = int(self.m2Box.get())
             except ValueError:
                 m2money = 0
             
             if m2money > 0:
                 if self.p2.balance < m2money: return messagebox.showerror("error", "Insufficient balance: Player 2.", parent=self)
-
-        difference = m1money - m2money
-        if difference > 0:
-            self.p2.adjustBalance(difference)
-        elif difference < 0:
-            self.p1.adjustBalance(difference)
+        
+        self.p1.adjustBalance(-m1money)
+        self.p2.adjustBalance(-m2money)
+        self.p1.adjustBalance(m2money)
+        self.p2.adjustBalance(m1money)
         
         if not self.p1 == None:
-            self.game.updatePlayerInfo(self.p1)
+            self.game.savePlayerInfo(self.p1)
         if not self.p2 == None:
-            self.game.updatePlayerInfo(self.p2)
+            self.game.savePlayerInfo(self.p2)
 
         if not loc1 == "":
-            self.game.updateLocationInfo(loc1)
-        if not loc1 == "":
-            self.game.updateLocationInfo(loc2)
+            self.game.saveLocationInfo(loc1)
+        if not loc2 == "":
+            self.game.saveLocationInfo(loc2)
 
         # clean up
         self.p1 = None
@@ -161,7 +160,7 @@ class TradeFrame(tk.Frame):
 
         self.game.returnToMain()
     
-    def updatePlayerLists(self):
+    def savePlayerLists(self):
         self.p1Box["values"] = [el for el in self.game.players.keys()]
         self.p2Box["values"] = [el for el in self.game.players.keys()]
     

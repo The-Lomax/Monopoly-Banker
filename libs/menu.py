@@ -13,6 +13,8 @@ class GameMenu(tk.Menu):
         mGame.add_separator()
         mGame.add_command(label="Reset Game", command=self.controller.game.resetGameState)
         mGame.add_separator()
+        mGame.add_command(label="End Game", command=self.controller.game.endGame)
+        mGame.add_separator()
         mGame.add_command(label="Exit", command=self.controller.safeExit)
 
         mPlayer = tk.Menu(self, tearoff=0)

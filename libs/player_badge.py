@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from PIL import Image, ImageTk
 
 
@@ -14,9 +15,9 @@ class PlayerBadge(tk.Frame):
         self.lFont = ("Helvetica", 24, "bold")
 
         # Images
-        infoImg = Image.open("assets/info.png")
-        scale = infoImg.resize((btnSize, btnSize))
-        scaledInfoImg = ImageTk.PhotoImage(scale)
+        startImg = Image.open("assets/start.png")
+        scale = startImg.resize((btnSize, btnSize))
+        scaledStartImg = ImageTk.PhotoImage(scale)
 
         addImg = Image.open("assets/add.png")
         scale = addImg.resize((btnSize, btnSize))
@@ -52,5 +53,19 @@ class PlayerBadge(tk.Frame):
         self.addBtn.image = scaledAddImg
         self.addBtn.pack(side="left", padx=(pad, 0))
 
+        self.startBtn = tk.Button(
+            self,
+            command=self.startEvent
+        )
+        self.startBtn["image"] = scaledStartImg
+        self.startBtn.image = scaledStartImg
+        self.startBtn.pack(side="left", padx=(pad, 0))
+
     def addEvent(self):
         self.game.mainWindow.addEvent(self.player)
+
+    def startEvent(self):
+        self.player.adjustBalance(200)
+        self.game.savePlayerInfo(self.player)
+        self.game.returnToMain()
+        messagebox.showinfo("info", f"{self.player.name} passed start and got 200.")

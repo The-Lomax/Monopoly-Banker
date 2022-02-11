@@ -8,3 +8,8 @@ class House:
         self.mortgage = mortgage
         self.status = status
         self.ownerId = ownerId
+    
+    def locateOwner(self, players):
+        for el in players.values():
+            if el.id == self.ownerId:
+                return el

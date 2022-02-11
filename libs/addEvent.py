@@ -153,6 +153,7 @@ class AddEvent(tk.Frame):
                         if not el.id == guest.id:
                             el.adjustBalance(-amount)
                             counter += 1
+                            self.game.savePlayerInfo(el)
                     guest.adjustBalance(amount * counter)
                 # or not
                 else:
@@ -187,8 +188,11 @@ class AddEvent(tk.Frame):
         self.eventEntry.delete(0, "end")
         self.eventVar.set(False)
 
-        self.game.savePlayerInfo(guest)
-        self.game.savePlayerInfo(owner)
+        if locType == "card":
+            self.game.savePlayerInfo(guest)
+        else:
+            self.game.savePlayerInfo(guest)
+            self.game.savePlayerInfo(owner)
 
         self.game.returnToMain()
 

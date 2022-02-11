@@ -65,7 +65,12 @@ class LocationFrame(tk.Frame):
         if location == "": return messagebox.showerror("error", "Select a location.", parent=self)
 
         # assign location object
-        loc = self.game.locations[location]
+        if location in self.game.locations.keys():
+            loc = self.game.locations[location]
+        elif location in self.game.houses.keys():
+            loc = self.game.houses[location]
+        else:
+            loc = self.game.poi[location]
 
         # process the event
         if self.mode == "build":
@@ -97,7 +102,7 @@ class LocationFrame(tk.Frame):
             buyer = self.game.players[buyer]
 
             # process the event
-            buyer.buy(self.game.locations[location])
+            buyer.buy(loc)
 
             self.game.savePlayerInfo(buyer)
         else:  # mortgage
@@ -110,8 +115,7 @@ class LocationFrame(tk.Frame):
 
         self.game.saveLocationInfo(loc)
 
-        self.game.mainWindow.playersFrame.loadPlayers()
-        self.game.mainWindow.showModule(self.game.mainWindow.playersFrame)
+        self.game.returnToMain()
     
     def refreshData(self):
         if self.mode == "build":

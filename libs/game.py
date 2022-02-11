@@ -1,3 +1,4 @@
+import math
 import requests
 from tkinter import messagebox
 from libs.gameData import housesInfo, locationsInfo, poiInfo
@@ -32,6 +33,44 @@ class Game:
         self.loadLocationsFromWeb()
         self.loadHousesFromWeb()
         self.loadPOIFromWeb()
+    
+    def endGame(self):
+        # calculate net worth
+        nets = {}
+        for el in self.players.values():
+            nets[el.id] = 0
+
+        for el in self.locations.values():
+            if el.status == "active":
+                nets[el.ownerId] += el.buyPrice
+            elif el.status == "mortgaged":
+                nets[el.ownerId] += el.buyPrice - el.mortgage
+            if el.buildings > 0:
+                nets[el.ownerId] += el.buildings * el.buildPrice
+        
+        for el in self.houses.values():
+            if el.status == "active":
+                nets[el.ownerId] += el.buyPrice
+            elif el.status == "mortgaged":
+                nets[el.ownerId] += el.buyPrice - el.mortgage
+        
+        for el in self.poi.values():
+            if el.status == "active":
+                nets[el.ownerId] += el.buyPrice
+            elif el.status == "mortgaged":
+                nets[el.ownerId] += el.buyPrice - el.mortgage
+        
+        myStr = f""
+
+        for el in self.players.values():
+            nets[el.id] += el.balance
+            myStr += f"{el.name}: {nets[el.id]}\n"
+        
+        messagebox.showinfo(
+            "FINISH",
+            myStr,
+            parent=self.mainWindow
+        )
 
     def addPlayer(self, pId: int, pName: str, pBal: int, pBkrupt: bool) -> None:
         self.players[pName] = Player(pId, pName, pBal, pBkrupt)
