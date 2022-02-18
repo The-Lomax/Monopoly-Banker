@@ -212,15 +212,22 @@ class Game:
         data = data.json()
         for el in data:
             rs = ''
-            if el["lRentSplits"]["S"] == '':
-                rs = {}
-            else:
-                rs = el["lRentSplits"]["S"]
+            if "S" in el["lRentSplits"].keys():
+                if el["lRentSplits"]["S"] == "":
+                    rs = {}
+                else:
+                    rs = el["lRentSplits"]["S"]
+            elif "M" in el["lRentSplits"].keys():
+                rs = el["lRentSplits"]["M"]
+
             rd = ''
-            if el["lRentDiscounts"]["S"] == '':
-                rd = {}
-            else:
-                rd = el["lRentDiscounts"]["S"]
+            if "S" in el["lRentDiscounts"].keys():
+                if el["lRentDiscounts"]["S"] == '':
+                    rd = {}
+                else:
+                    rd = el["lRentDiscounts"]["S"]
+            elif "M" in el["lRentDiscounts"].keys():
+                    rd = el["lRentDiscounts"]["M"]
             locationsList.append([
                 el["lType"]["S"],
                 int(el["lId"]["N"]),
