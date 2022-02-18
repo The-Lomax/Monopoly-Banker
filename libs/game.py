@@ -112,8 +112,8 @@ class Game:
                 "lMortgage": location.mortgage,
                 "lBuildPrice": location.buildPrice,
                 "lBuildings": location.buildings,
-                "lRentSplits": ds,
-                "lRentDiscounts": rs,
+                "lRentSplits": rs,
+                "lRentDiscounts": ds,
                 "lStatus": location.status,
                 "lOwnerId": location.ownerId
             }
@@ -218,7 +218,9 @@ class Game:
                 else:
                     rs = el["lRentSplits"]["S"]
             elif "M" in el["lRentSplits"].keys():
-                rs = el["lRentSplits"]["M"]
+                rs = {}
+                for key, itm in el["lRentSplits"]["M"].items():
+                    rs[key] = int(itm["N"])
 
             rd = ''
             if "S" in el["lRentDiscounts"].keys():
@@ -227,7 +229,10 @@ class Game:
                 else:
                     rd = el["lRentDiscounts"]["S"]
             elif "M" in el["lRentDiscounts"].keys():
-                    rd = el["lRentDiscounts"]["M"]
+                rd = {}
+                for key, itm in el["lRentDiscounts"]["M"].items():
+                    rd[key] = int(itm["N"])
+            
             locationsList.append([
                 el["lType"]["S"],
                 int(el["lId"]["N"]),
