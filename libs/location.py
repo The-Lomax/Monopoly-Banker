@@ -23,12 +23,16 @@ class Location:
             self.discounts[player] = percentage
         if self.discounts[player] > 100:
             self.discounts[player] = 100
+        if self.discounts[player] < 0:
+            self.discounts[player] = 0
 
     def addRentSplit(self, player, percentage):
         if player in self.rentSplits.keys():
             self.rentSplits[player] += percentage
         else:
             self.rentSplits[player] = percentage
+        if self.rentSplits[player] < 0:
+            self.rentSplits[player] = 0
     
     def setOwnership(self, player):
         self.ownerId = player.id

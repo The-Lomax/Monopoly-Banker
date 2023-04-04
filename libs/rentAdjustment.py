@@ -60,7 +60,7 @@ class RentAdjustmentFrame(tk.Frame):
         if name == "": return messagebox.showerror("error", f"Player not selected.", parent=self)
 
         pct = self.getPct()
-        if pct <= 0: return messagebox.showerror("error", f"Discount must be greater than 0%.", parent=self)
+        if pct < -100: return messagebox.showerror("error", f"Discount value invalid.", parent=self)
 
         loc = self.getLoc()
 
